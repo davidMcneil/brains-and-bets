@@ -3,21 +3,20 @@ mod question_lookup;
 mod tests;
 mod types;
 
-use parking_lot::Mutex;
+use parking_lot::{Mutex, RwLock};
 use question_lookup::QuestionLookup;
 use rocket::{
     self, config::LogLevel, delete, get, http::Method, post, put, routes, serde::json::Json,
     Config, State,
 };
 use rocket_cors::{AllowedOrigins, CorsOptions};
-use std::collections::HashMap;
 use std::net::IpAddr;
 use std::path::PathBuf;
 use structopt::StructOpt;
-use types::{Game, Guess, Player, PlayerData, Result, Wager};
+use types::{Game, Guess, PlayerData, Result, Scores, Wager};
 
 type Games = Mutex<types::Games>;
-type Questions = Mutex<QuestionLookup>;
+type Questions = RwLock<QuestionLookup>;
 
 #[get("/heartbeat")]
 fn heartbeat() -> &'static str {
@@ -33,7 +32,7 @@ fn create_game(
 ) -> Result<()> {
     let mut games = games.lock();
     let player = player.into_inner();
-    games.create(game_id, player.player, questions.lock().get())
+    games.create(game_id, player.player, questions.read().get())
 }
 
 #[post("/game/<game_id>", data = "<player>")]
@@ -70,7 +69,7 @@ fn wager(
     let game = games.get(&game_id)?;
     let wager = wager.into_inner();
     game.wager(wager)?;
-    game.add_round_if_complete(questions.lock().get());
+    game.add_round_if_complete(questions.read().get());
     Ok(())
 }
 
@@ -89,7 +88,7 @@ fn delete_game(game_id: String, games: &State<Games>) {
 }
 
 #[get("/game/<game_id>/score")]
-fn get_score(game_id: String, games: &State<Games>) -> Result<Json<HashMap<Player, u32>>> {
+fn get_score(game_id: String, games: &State<Games>) -> Result<Json<Scores>> {
     let mut games = games.lock();
     let game = games.get(&game_id)?.clone();
     Ok(Json(game.get_score()))

@@ -17,6 +17,7 @@ pub(crate) type Player = String;
 pub(crate) type AnswerAmount = u32;
 pub(crate) type ScoreAmount = u32;
 pub(crate) type GameId = String;
+pub(crate) type Scores = HashMap<Player, ScoreAmount>;
 
 #[derive(Deserialize, Serialize, Debug, Display, Error)]
 pub(crate) enum Error {
@@ -203,8 +204,8 @@ impl Game {
         if !self.players.contains(player) {
             return Err(Error::PlayerNotFound);
         }
-        // Confirm we are collecting answers for the current round
-        if self.current_round_state() < RoundState::CollectingGuesses {
+        // Confirm we are collecting guesses for the current round
+        if self.current_round_state() <= RoundState::CollectingGuesses {
             return Err(Error::RoundNotInCollectingGuessesState);
         }
         // Add or replace the answer
@@ -256,7 +257,7 @@ impl Game {
         round.state(players)
     }
 
-    pub fn get_score(&self) -> HashMap<Player, ScoreAmount> {
+    pub fn get_score(&self) -> Scores {
         todo!("implement this")
     }
 }
