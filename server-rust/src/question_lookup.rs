@@ -5,11 +5,13 @@ use std::{
     path::Path,
 };
 
+use crate::types::Question;
+
 const DEFAULT_QUESTION: &str = "Answer the question you would have liked to be asked?";
 
 #[derive(Default)]
 pub(crate) struct QuestionLookup {
-    questions: Vec<String>,
+    questions: Vec<Question>,
 }
 
 impl QuestionLookup {
@@ -17,15 +19,24 @@ impl QuestionLookup {
         let file = File::open(path)?;
         let reader = BufReader::new(file);
         for line in reader.lines() {
-            self.questions.push(line?);
+            // TODO: parse the line to get the question and answer (eg `<answer>,<question>`)
+            self.questions.push(Question {
+                question: line?,
+                answer: 0,
+            });
         }
         Ok(())
     }
 
-    pub(crate) fn get(&self) -> String {
+    pub(crate) fn get(&self) -> Question {
+        // TODO: this would be better to randomize the questions and then do them in order to avoid duplicates
         let mut rng = rand::thread_rng();
-        self.questions
-            .choose(&mut rng)
-            .map_or_else(|| String::from(DEFAULT_QUESTION), |q| q.clone())
+        self.questions.choose(&mut rng).map_or_else(
+            || Question {
+                question: String::from(DEFAULT_QUESTION),
+                answer: 0,
+            },
+            |q| q.clone(),
+        )
     }
 }

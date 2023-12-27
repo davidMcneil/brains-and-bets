@@ -1,186 +1,168 @@
-mod traits;
-
+use derive_more::{Deref, IntoIterator};
+use displaydoc::Display;
+use rocket::{
+    http::{ContentType, Status},
+    response::{self, Responder},
+    Request, Response,
+};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{HashMap, HashSet},
-    error, fmt,
-    ops::Deref,
+    io::Cursor,
 };
+use thiserror::Error;
 
 pub(crate) type Result<T> = std::result::Result<T, Error>;
 pub(crate) type Player = String;
+pub(crate) type AnswerAmount = u32;
+pub(crate) type ScoreAmount = u32;
 pub(crate) type GameId = String;
 
-#[derive(Serialize, Debug)]
+#[derive(Deserialize, Serialize, Debug, Display, Error)]
 pub(crate) enum Error {
+    /// game conflict
     GameConflict,
+    /// game not found
     GameNotFound,
+    /// player conflict
     PlayerConflict,
+    /// player not found
     PlayerNotFound,
+    /// round not in start state
     RoundNotInStartState,
-    RoundNotInCollectingAnswersState,
+    /// round not in collecting guesses state
     RoundNotInCollectingGuessesState,
-    GuessedPlayerNotFound,
+    /// round not in collecting wagers state
+    RoundNotInCollectingWagersState,
+    /// guess not found
+    GuessNotFound,
 }
-
-impl fmt::Display for Error {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::GameConflict => write!(f, "game conflict"),
-            Self::GameNotFound => write!(f, "game not found"),
-            Self::PlayerConflict => write!(f, "player conflict"),
-            Self::PlayerNotFound => write!(f, "player not found"),
-            Self::RoundNotInStartState => write!(f, "round not in start state"),
-            Self::RoundNotInCollectingAnswersState => {
-                write!(f, "round not in collecting answer state")
-            }
-            Self::RoundNotInCollectingGuessesState => {
-                write!(f, "round not in collecting guess state")
-            }
-            Self::GuessedPlayerNotFound => write!(f, "guessed player not found"),
-        }
-    }
-}
-
-impl error::Error for Error {}
 
 #[derive(Deserialize, Serialize)]
 pub(crate) struct BadRequest {
-    error: String,
+    error: Error,
     message: String,
 }
 
 impl BadRequest {
     fn new(error: Error) -> Self {
         Self {
-            error: format!("{error:?}"),
             message: format!("{error}"),
+            error,
         }
+    }
+}
+
+impl<'r> Responder<'r, 'static> for Error {
+    fn respond_to(self, _: &'r Request<'_>) -> response::Result<'static> {
+        let body = BadRequest::new(self);
+        let body = serde_json::to_string(&body).expect("to BadRequest serialize");
+        Ok(Response::build()
+            .status(Status::BadRequest)
+            .header(ContentType::JSON)
+            .sized_body(body.len(), Cursor::new(body))
+            .finalize())
     }
 }
 
 #[derive(Deserialize, Serialize)]
 pub(crate) struct PlayerData {
     /// The player with which the request is associated
-    pub(crate) player: Player,
+    pub player: Player,
 }
 
-#[cfg(test)]
-impl PlayerData {
-    pub(crate) fn new(player: &str) -> Self {
-        Self {
-            player: Player::from(player),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
-pub(crate) struct Answer {
-    /// The player who gave the answer
-    player: Player,
-    /// The answer to the question for the round
-    pub answer: String,
-}
-
-#[cfg(test)]
-impl Answer {
-    pub(crate) fn new(player: &str, answer: &str) -> Self {
-        Self {
-            player: Player::from(player),
-            answer: String::from(answer),
-        }
-    }
-}
-
-#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
-pub(crate) struct Answers(Vec<Answer>);
-
-impl Deref for Answers {
-    type Target = Vec<Answer>;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl From<Vec<Answer>> for Answers {
-    fn from(value: Vec<Answer>) -> Self {
-        let mut unique_answers = Vec::new();
-        let mut seen_players = std::collections::HashSet::new();
-        for answer in value {
-            if seen_players.insert(answer.player.clone()) {
-                unique_answers.push(answer);
-            }
-        }
-        Answers(unique_answers)
-    }
-}
-
-impl IntoIterator for Answers {
-    type Item = Answer;
-    type IntoIter = std::vec::IntoIter<Answer>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.0.into_iter()
-    }
+#[derive(Clone, Deserialize, Serialize)]
+pub(crate) struct Question {
+    /// The question for the round
+    pub question: String,
+    /// The correct answer to the question
+    pub answer: AnswerAmount,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
 pub(crate) struct Guess {
     /// The player making the guess
     pub player: Player,
-    /// The list of guessed answers, one per player
-    pub answers: Answers,
+    /// The players guess for the round
+    pub guess: AnswerAmount,
 }
 
-#[cfg(test)]
-impl Guess {
-    pub(crate) fn new(player: &str, guess: Vec<Answer>) -> Self {
-        Self {
-            player: Player::from(player),
-            answers: Answers::from(guess),
+#[derive(Debug, Default, Clone, Deserialize, Serialize, Deref, IntoIterator)]
+pub(crate) struct Guesses(Vec<Guess>);
+
+impl Guesses {
+    fn add_or_replace(&mut self, guess: Guess) {
+        if let Some(existing_guess_index) = self.iter().position(|g| g.player == guess.player) {
+            self.0[existing_guess_index] = guess;
+        } else {
+            self.0.push(guess);
+        }
+    }
+
+    fn contains(&mut self, guess: AnswerAmount) -> bool {
+        self.iter().any(|g| g.guess == guess)
+    }
+}
+
+#[derive(Debug, Clone, Deserialize, Serialize, PartialEq, Eq, Hash)]
+pub(crate) struct Wager {
+    /// The player making the wager
+    pub player: Player,
+    /// The guess the player is wagering on
+    pub guess: AnswerAmount,
+    /// The players wager amount
+    pub wager: ScoreAmount,
+}
+
+#[derive(Debug, Default, Clone, Deserialize, Serialize, Deref, IntoIterator)]
+pub(crate) struct Wagers(Vec<Wager>);
+
+impl Wagers {
+    fn add_or_replace(&mut self, wager: Wager) {
+        if let Some(existing_wager_index) = self.iter().position(|w| w.player == wager.player) {
+            self.0[existing_wager_index] = wager;
+        } else {
+            self.0.push(wager);
         }
     }
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Eq, PartialOrd, Ord)]
 pub(crate) enum RoundState {
     Start,
-    CollectingAnswers,
     CollectingGuesses,
+    CollectingWagers,
     Complete,
 }
 
 #[derive(Clone, Deserialize, Serialize)]
 pub(crate) struct Round {
     /// The question for the round
-    question: String,
-    /// The list of answers given, one per player
-    pub(crate) answers: HashSet<Answer>,
-    /// The list of guesses made, one per player
-    pub(crate) guesses: HashSet<Guess>,
+    pub question: Question,
+    /// The list of guesses given, one per player
+    pub guesses: Guesses,
+    /// The list of wagers made, one per player
+    pub wagers: Wagers,
 }
 
 impl Round {
-    fn new(question: String) -> Self {
+    fn new(question: Question) -> Self {
         Round {
             question,
-            answers: HashSet::new(),
-            guesses: HashSet::new(),
+            guesses: Guesses::default(),
+            wagers: Wagers::default(),
         }
     }
 
     fn state(&self, players: usize) -> RoundState {
-        if self.answers.is_empty() {
-            RoundState::Start
-        } else if self.answers.len() < players {
-            RoundState::CollectingAnswers
-        } else if self.guesses.len() < players {
-            RoundState::CollectingGuesses
-        } else if self.answers.len() == players && self.guesses.len() == players {
-            RoundState::Complete
-        } else {
-            panic!("Round in unknown state")
+        match (self.guesses.len(), self.wagers.len()) {
+            (0, 0) => RoundState::Start,
+            (guesses, 0) if guesses < players => RoundState::CollectingGuesses,
+            (guesses, wagers) if guesses == players && wagers < players => {
+                RoundState::CollectingWagers
+            }
+            (guesses, wagers) if guesses == players && wagers == players => RoundState::Complete,
+            _ => panic!("Round in unknown state"),
         }
     }
 }
@@ -188,9 +170,9 @@ impl Round {
 #[derive(Clone, Default, Deserialize, Serialize)]
 pub(crate) struct Game {
     /// The list of players in the game
-    pub(crate) players: HashSet<String>,
+    pub players: HashSet<Player>,
     /// The list of rounds in the game with the most recent round being the last item in the list
-    pub(crate) rounds: Vec<Round>,
+    pub rounds: Vec<Round>,
 }
 
 impl Game {
@@ -215,54 +197,47 @@ impl Game {
         Ok(())
     }
 
-    pub(crate) fn answer(&mut self, answer: Answer) -> Result<()> {
-        let player = &answer.player;
-        // Confirm the player exists
-        if !self.players.contains(player) {
-            return Err(Error::PlayerNotFound);
-        }
-        // Confirm we are collecting answers for the current round
-        let state = self.current_round_state();
-        if state != RoundState::Start && self.current_round_state() != RoundState::CollectingAnswers
-        {
-            return Err(Error::RoundNotInCollectingAnswersState);
-        }
-        // Add or replace the answer
-        let round = self.current_round_mut();
-        round.answers.replace(answer);
-        Ok(())
-    }
-
     pub(crate) fn guess(&mut self, guess: Guess) -> Result<()> {
         let player = &guess.player;
         // Confirm the player exists
         if !self.players.contains(player) {
             return Err(Error::PlayerNotFound);
         }
-        // Confirm we are adding collecting for the current round
-        if self.current_round_state() != RoundState::CollectingGuesses {
+        // Confirm we are collecting answers for the current round
+        if self.current_round_state() < RoundState::CollectingGuesses {
             return Err(Error::RoundNotInCollectingGuessesState);
         }
-        // Confirm the guesses are valid
-        for g in guess.answers.iter() {
-            if !self.players.contains(&g.player) {
-                return Err(Error::GuessedPlayerNotFound);
-            }
-        }
-        // Add or replace the guess
+        // Add or replace the answer
         let round = self.current_round_mut();
-        round.guesses.replace(guess);
+        round.guesses.add_or_replace(guess);
         Ok(())
     }
 
-    pub(crate) fn add_round_if_complete(&mut self, question: String) {
-        if self.current_round_state() == RoundState::Complete {
-            self.add_round(question);
+    pub(crate) fn wager(&mut self, wager: Wager) -> Result<()> {
+        let player = &wager.player;
+        // Confirm the player exists
+        if !self.players.contains(player) {
+            return Err(Error::PlayerNotFound);
         }
+        // Confirm we are adding collecting for the current round
+        if self.current_round_state() != RoundState::CollectingWagers {
+            return Err(Error::RoundNotInCollectingWagersState);
+        }
+        // Confirm the wagers are valid
+        let round = self.current_round_mut();
+        if !round.guesses.contains(wager.guess) {
+            return Err(Error::GuessNotFound);
+        }
+        // TODO: check that the amount is less than or equal to what the user could wager
+        // Add or replace the guess
+        round.wagers.add_or_replace(wager);
+        Ok(())
     }
 
-    fn add_round(&mut self, question: String) {
-        self.rounds.push(Round::new(question));
+    pub(crate) fn add_round_if_complete(&mut self, question: Question) {
+        if self.rounds.is_empty() || self.current_round_state() == RoundState::Complete {
+            self.rounds.push(Round::new(question));
+        }
     }
 
     pub(crate) fn current_round(&self) -> &Round {
@@ -281,26 +256,13 @@ impl Game {
         round.state(players)
     }
 
-    pub fn get_score(&self) -> HashMap<String, i32> {
-        let mut scores = HashMap::new();
-        for round in &self.rounds {
-            for guess in &round.guesses {
-                for answer in guess.answers.iter() {
-                    let score = scores.entry(guess.player.clone()).or_insert(0);
-                    if round.answers.contains(answer) {
-                        *score += 1;
-                    } else {
-                        *score -= 1;
-                    }
-                }
-            }
-        }
-        scores
+    pub fn get_score(&self) -> HashMap<Player, ScoreAmount> {
+        todo!("implement this")
     }
 }
 
 #[derive(Default)]
-pub(crate) struct Games(HashMap<String, Game>);
+pub(crate) struct Games(HashMap<GameId, Game>);
 
 impl Games {
     #[allow(clippy::map_entry)]
@@ -308,13 +270,13 @@ impl Games {
         &mut self,
         game_id: String,
         initial_player: Player,
-        initial_question: String,
+        question: Question,
     ) -> Result<()> {
         if self.0.contains_key(&game_id) {
             Err(Error::GameConflict)
         } else {
             let mut game = Game::default();
-            game.add_round(initial_question);
+            game.add_round_if_complete(question);
             game.add_player(initial_player)?;
             self.0.insert(game_id, game);
             Ok(())

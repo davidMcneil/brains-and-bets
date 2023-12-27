@@ -1,15 +1,17 @@
 [package]
-name = "weighty-inquiry"
+name = "brains-and-bets"
 version = "0.1.0"
 authors = ["David McNeil <mcneil.david2@gmail.com>"]
 edition = "2021"
 
 [dependencies]
+displaydoc = "0.2"
+derive_more = { version = "1.0.0-beta.6", features = ["full"] }
 parking_lot = "0.12"
 rand = "0.8"
-rocket = "0.4"
-rocket_contrib = "0.4"
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+rocket = { version = "0.5", features = ["json"] }
+rocket_cors = "0.6"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 structopt = "0.3"
-rocket_cors = "0.5.1"
+thiserror = "1"
