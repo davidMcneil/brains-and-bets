@@ -92,7 +92,7 @@ pub(crate) struct Guess {
 pub(crate) struct Guesses(Vec<Guess>);
 
 impl Guesses {
-    fn add_or_replace(&mut self, guess: Guess) {
+    pub fn add_or_replace(&mut self, guess: Guess) {
         if let Some(existing_guess_index) = self.iter().position(|g| g.player == guess.player) {
             self.0[existing_guess_index] = guess;
         } else {
@@ -147,7 +147,7 @@ pub(crate) struct Round {
 }
 
 impl Round {
-    fn new(question: Question) -> Self {
+    pub fn new(question: Question) -> Self {
         Round {
             question,
             guesses: Guesses::default(),
@@ -167,7 +167,7 @@ impl Round {
         }
     }
 
-    fn get_closest_guess(&self) -> Option<&Guess> {
+    pub fn get_closest_guess(&self) -> Option<&Guess> {
         // Get the greatest guess that is not greater than the actual answer
         self.guesses
             .iter()
@@ -177,6 +177,7 @@ impl Round {
 
     fn get_score_changes(&self, payout_ratio: i32) -> Scores {
         let closest_guess = self.get_closest_guess();
+        // TODO: right now this does not allow for guessing below the lowest guess, in this case right now, closest_guess will just be None so the scores won't change this round
         match closest_guess {
             None => HashMap::new(),
             Some(closest_guess) => {
