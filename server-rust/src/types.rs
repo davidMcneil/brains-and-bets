@@ -15,7 +15,7 @@ use thiserror::Error;
 pub(crate) type Result<T> = std::result::Result<T, Error>;
 pub(crate) type Player = String;
 pub(crate) type AnswerAmount = u32;
-pub(crate) type ScoreAmount = u32;
+pub(crate) type ScoreAmount = i32;
 pub(crate) type GameId = String;
 pub(crate) type Scores = HashMap<Player, ScoreAmount>;
 
@@ -166,6 +166,45 @@ impl Round {
             _ => panic!("Round in unknown state"),
         }
     }
+
+    fn get_closest_guess(&self) -> Option<&Guess> {
+        // Get the greatest guess that is not greater than the actual answer
+        self.guesses
+            .iter()
+            .filter(|guess| guess.guess <= self.question.answer)
+            .max_by_key(|guess| guess.guess)
+    }
+
+    fn get_score_changes(&self, payout_ratio: i32) -> Scores {
+        let closest_guess = self.get_closest_guess();
+        match closest_guess {
+            None => HashMap::new(),
+            Some(closest_guess) => {
+                let mut score_changes = HashMap::new();
+                for wager in self.wagers.iter() {
+                    let score_change = if wager.guess == closest_guess.guess {
+                        // With the correct wager, the player gets a payout proportional to the wager amount
+                        wager.wager * payout_ratio
+                    } else if wager.wager >= 1 {
+                        // With an incorrect wager of at least 1, the player loses all but 1 of the wager amount
+                        -wager.wager + 1
+                    } else {
+                        // With a wager of 0, there is no gain or loss
+                        0
+                    };
+                    score_changes
+                        .insert(wager.player.clone(), score_change)
+                        .expect("each player has exactly 1 wager");
+                }
+                // Add 1 to the player with the closest guess
+                let correct_player_score = score_changes
+                    .entry(closest_guess.player.clone())
+                    .or_insert(0);
+                *correct_player_score += 1;
+                score_changes
+            }
+        }
+    }
 }
 
 #[derive(Clone, Default, Deserialize, Serialize)]
@@ -258,7 +297,16 @@ impl Game {
     }
 
     pub fn get_score(&self) -> Scores {
-        todo!("implement this")
+        let mut scores = HashMap::new();
+        for round in &self.rounds {
+            let round_score_changes = round.get_score_changes(3);
+            for (player, round_score_change) in &round_score_changes {
+                // Everyone start off with a score of 1
+                let score = scores.entry(player.clone()).or_insert(1);
+                *score += round_score_change;
+            }
+        }
+        scores
     }
 }
 
