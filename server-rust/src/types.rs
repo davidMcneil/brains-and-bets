@@ -243,8 +243,9 @@ impl Game {
             return Err(Error::PlayerNotFound);
         }
         // Confirm we are collecting guesses for the current round
-        if self.current_round_state() != RoundState::CollectingGuesses {
-            return Err(Error::RoundNotInCollectingGuessesState);
+        match self.current_round_state() {
+            RoundState::Start | RoundState::CollectingGuesses => (),
+            _ => return Err(Error::RoundNotInCollectingGuessesState),
         }
         // Add or replace the answer
         let round = self.current_round_mut();
