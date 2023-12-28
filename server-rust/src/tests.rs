@@ -1,4 +1,4 @@
-use crate::types::{Game, Guess, Round};
+use crate::types::{Game, Round};
 use serde_json::from_str;
 use std::collections::HashMap;
 
@@ -28,13 +28,7 @@ fn test_get_closest_guess_multiple_guesses() {
 
     let round: Round = from_str(round_json).expect("Failed to deserialize Round");
 
-    assert_eq!(
-        round.get_closest_guess(),
-        Some(&Guess {
-            player: "Player2".to_string(),
-            guess: 4
-        })
-    );
+    assert_eq!(round.get_closest_guess(), Some(4));
 }
 
 #[test]
@@ -129,6 +123,43 @@ fn test_get_score_changes_incorrect_wager() {
 
     let expected_changes_json = r#"{
         "Player1": -2
+    }"#;
+    let expected_changes: HashMap<String, i32> =
+        from_str(expected_changes_json).expect("Failed to deserialize expected changes");
+
+    assert_eq!(score_changes, expected_changes);
+}
+
+#[test]
+fn test_get_score_changes_all_guesses_too_high() {
+    let round_json = r#"{
+        "question": {
+            "question": "What is the capital of France?",
+            "answer": 5
+        },
+        "guesses": [
+            {
+                "player": "Player1",
+                "guess": 10
+            }
+        ],
+        "wagers": [
+            {
+                "player": "Player1",
+                "guess": null,
+                "wager": 5
+            }
+        ]
+    }"#;
+
+    let round: Round = from_str(round_json).expect("Failed to deserialize Round");
+
+    let payout_ratio = 3;
+    let closest_guess_bonus = 2;
+    let score_changes = round.get_score_changes(payout_ratio, closest_guess_bonus);
+
+    let expected_changes_json = r#"{
+        "Player1": 15
     }"#;
     let expected_changes: HashMap<String, i32> =
         from_str(expected_changes_json).expect("Failed to deserialize expected changes");

@@ -37,6 +37,8 @@ pub(crate) enum Error {
     RoundNotInCollectingWagersState,
     /// guess not found
     GuessNotFound,
+    /// invalid wager
+    InvalidWager,
 }
 
 #[derive(Deserialize, Serialize)]
@@ -109,8 +111,8 @@ impl Guesses {
 pub(crate) struct Wager {
     /// The player making the wager
     pub player: Player,
-    /// The guess the player is wagering on
-    pub guess: AnswerAmount,
+    /// The guess the player is wagering on, None is a wager that the correct value is below all guesses
+    pub guess: Option<AnswerAmount>,
     /// The players wager amount
     pub wager: ScoreAmount,
 }
@@ -167,42 +169,42 @@ impl Round {
         }
     }
 
-    pub fn get_closest_guess(&self) -> Option<&Guess> {
+    pub fn get_closest_guess(&self) -> Option<u32> {
         // Get the greatest guess that is not greater than the actual answer
         self.guesses
             .iter()
-            .filter(|guess| guess.guess <= self.question.answer)
-            .max_by_key(|guess| guess.guess)
+            .map(|guess| guess.guess)
+            .filter(|guess| guess <= &self.question.answer)
+            .max()
     }
 
     pub fn get_score_changes(&self, payout_ratio: i32, closest_guess_bonus: i32) -> Scores {
         let closest_guess = self.get_closest_guess();
-        // TODO: right now this does not allow for guessing below the lowest guess, in this case right now, closest_guess will just be None so the scores won't change this round
-        match closest_guess {
-            None => HashMap::new(),
-            Some(closest_guess) => {
-                let mut score_changes = HashMap::new();
-                for wager in self.wagers.iter() {
-                    let score_change = if wager.guess == closest_guess.guess {
-                        // With the correct wager, the player gets a payout proportional to the wager amount
-                        wager.wager * payout_ratio
-                    } else if wager.wager >= 1 {
-                        // With an incorrect wager of at least 1, the player loses all but 1 of the wager amount
-                        -wager.wager + 1
-                    } else {
-                        // With a wager of 0, there is no gain or loss
-                        0
-                    };
-                    score_changes.insert(wager.player.clone(), score_change);
+        let mut score_changes = HashMap::new();
+        for wager in self.wagers.iter() {
+            let score_change = if wager.guess == closest_guess {
+                // With the correct wager, the player gets a payout proportional to the wager amount
+                wager.wager * payout_ratio
+            } else if wager.wager >= 1 {
+                // With an incorrect wager of at least 1, the player loses all but 1 of the wager amount
+                -wager.wager + 1
+            } else {
+                // With a wager of 0, there is no gain or loss
+                0
+            };
+            score_changes.insert(wager.player.clone(), score_change);
+        }
+        // Add an extra bonus to the players with the closest guess
+        if let Some(closest_guess) = closest_guess {
+            for guess in self.guesses.iter() {
+                if guess.guess == closest_guess {
+                    let closest_player_score =
+                        score_changes.entry(guess.player.clone()).or_insert(0);
+                    *closest_player_score += closest_guess_bonus;
                 }
-                // Add an extra bonus to the player with the closest guess
-                let closest_player_score = score_changes
-                    .entry(closest_guess.player.clone())
-                    .or_insert(0);
-                *closest_player_score += closest_guess_bonus;
-                score_changes
             }
         }
+        score_changes
     }
 }
 
@@ -259,14 +261,16 @@ impl Game {
         if !self.players.contains(player) {
             return Err(Error::PlayerNotFound);
         }
-        // Confirm we are adding collecting for the current round
+        // Confirm we are collecting wagers for the current round
         if self.current_round_state() != RoundState::CollectingWagers {
             return Err(Error::RoundNotInCollectingWagersState);
         }
         // Confirm the wagers are valid
         let round = self.current_round_mut();
-        if !round.guesses.contains(wager.guess) {
-            return Err(Error::GuessNotFound);
+        if let Some(some_wager_guess) = wager.guess {
+            if !round.guesses.contains(some_wager_guess) {
+                return Err(Error::GuessNotFound);
+            }
         }
         // TODO: check that the amount is less than or equal to what the user could wager
         // Add or replace the guess
