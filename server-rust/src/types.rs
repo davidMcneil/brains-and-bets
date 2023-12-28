@@ -119,7 +119,7 @@ pub(crate) struct Wager {
 pub(crate) struct Wagers(Vec<Wager>);
 
 impl Wagers {
-    fn add_or_replace(&mut self, wager: Wager) {
+    pub fn add_or_replace(&mut self, wager: Wager) {
         if let Some(existing_wager_index) = self.iter().position(|w| w.player == wager.player) {
             self.0[existing_wager_index] = wager;
         } else {
@@ -175,7 +175,7 @@ impl Round {
             .max_by_key(|guess| guess.guess)
     }
 
-    fn get_score_changes(&self, payout_ratio: i32) -> Scores {
+    pub fn get_score_changes(&self, payout_ratio: i32, closest_guess_bonus: i32) -> Scores {
         let closest_guess = self.get_closest_guess();
         // TODO: right now this does not allow for guessing below the lowest guess, in this case right now, closest_guess will just be None so the scores won't change this round
         match closest_guess {
@@ -193,15 +193,13 @@ impl Round {
                         // With a wager of 0, there is no gain or loss
                         0
                     };
-                    score_changes
-                        .insert(wager.player.clone(), score_change)
-                        .expect("each player has exactly 1 wager");
+                    score_changes.insert(wager.player.clone(), score_change);
                 }
-                // Add 1 to the player with the closest guess
-                let correct_player_score = score_changes
+                // Add an extra bonus to the player with the closest guess
+                let closest_player_score = score_changes
                     .entry(closest_guess.player.clone())
                     .or_insert(0);
-                *correct_player_score += 1;
+                *closest_player_score += closest_guess_bonus;
                 score_changes
             }
         }
@@ -300,7 +298,7 @@ impl Game {
     pub fn get_score(&self) -> Scores {
         let mut scores = HashMap::new();
         for round in &self.rounds {
-            let round_score_changes = round.get_score_changes(3);
+            let round_score_changes = round.get_score_changes(3, 1);
             for (player, round_score_change) in &round_score_changes {
                 // Everyone start off with a score of 1
                 let score = scores.entry(player.clone()).or_insert(1);
