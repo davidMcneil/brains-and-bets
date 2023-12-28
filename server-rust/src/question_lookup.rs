@@ -21,7 +21,7 @@ impl QuestionLookup {
         let reader = BufReader::new(file);
         for line in reader.lines() {
             let line = line?;
-            let values: Vec<&str> = line.split(",").collect();
+            let values: Vec<&str> = line.split(',').collect();
             self.questions.push(Question {
                 question: values[0].to_string(),
                 answer: values[1]

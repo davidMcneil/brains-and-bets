@@ -315,7 +315,13 @@ impl Game {
         for player in &self.players {
             scores.insert(player.clone(), 1);
         }
-        for round in &self.rounds {
+        // Do not score the current round if it is not Complete
+        let last_round_to_score = if self.current_round_state() == RoundState::Complete {
+            self.rounds.len()
+        } else {
+            self.rounds.len() - 1
+        };
+        for round in &self.rounds[..last_round_to_score] {
             let round_score_changes = round.get_score_changes(3, 1);
             for (player, round_score_change) in &round_score_changes {
                 let score = scores.entry(player.clone()).or_insert(1);
