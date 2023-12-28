@@ -266,13 +266,23 @@ impl Game {
             return Err(Error::RoundNotInCollectingWagersState);
         }
         // Confirm the wagers are valid
+        let scores = self.get_score();
         let round = self.current_round_mut();
         if let Some(some_wager_guess) = wager.guess {
             if !round.guesses.contains(some_wager_guess) {
                 return Err(Error::GuessNotFound);
             }
         }
-        // TODO: check that the amount is less than or equal to what the user could wager
+        // Check that the amount is less than or equal to their score so far
+        match scores.get(&wager.player) {
+            Some(score) => {
+                if &wager.wager > score {
+                    return Err(Error::InvalidWager);
+                }
+            }
+            None => return Err(Error::PlayerNotFound),
+        }
+
         // Add or replace the guess
         round.wagers.add_or_replace(wager);
         Ok(())
@@ -302,10 +312,13 @@ impl Game {
 
     pub fn get_score(&self) -> Scores {
         let mut scores = HashMap::new();
+        // Everyone start off with a score of 1
+        for player in &self.players {
+            scores.insert(player.clone(), 1);
+        }
         for round in &self.rounds {
             let round_score_changes = round.get_score_changes(3, 1);
             for (player, round_score_change) in &round_score_changes {
-                // Everyone start off with a score of 1
                 let score = scores.entry(player.clone()).or_insert(1);
                 *score += round_score_change;
             }
