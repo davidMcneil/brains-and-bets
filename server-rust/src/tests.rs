@@ -1,6 +1,9 @@
-use crate::types::{Game, Round};
+use crate::{
+    question_lookup::QuestionLookup,
+    types::{Game, Round},
+};
 use serde_json::from_str;
-use std::collections::HashMap;
+use std::{collections::HashMap, io, path::PathBuf};
 
 #[test]
 fn test_get_closest_guess_multiple_guesses() {
@@ -228,4 +231,18 @@ fn test_get_score() {
         from_str(expected_scores_json).expect("Failed to deserialize expected scores");
 
     assert_eq!(scores, expected_scores);
+}
+
+#[test]
+fn test_question_lookup() -> io::Result<()> {
+    let mut questions = QuestionLookup::default();
+    questions.populate_from_file(&PathBuf::from("test-questions.txt"))?;
+    let q1 = questions.get();
+    let q2 = questions.get();
+    let q3 = questions.get();
+    let q4 = questions.get();
+    assert_ne!(q1, q2);
+    assert_ne!(q1, q3);
+    assert_eq!(q1, q4);
+    Ok(())
 }

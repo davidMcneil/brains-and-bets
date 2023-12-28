@@ -74,7 +74,7 @@ pub(crate) struct PlayerData {
     pub player: Player,
 }
 
-#[derive(Clone, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize, Debug, PartialEq, Eq)]
 pub(crate) struct Question {
     /// The question for the round
     pub question: String,

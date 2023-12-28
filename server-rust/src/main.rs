@@ -32,7 +32,7 @@ fn create_game(
 ) -> Result<()> {
     let mut games = games.lock();
     let player = player.into_inner();
-    games.create(game_id, player.player, questions.read().get())
+    games.create(game_id, player.player, questions.write().get())
 }
 
 #[post("/game/<game_id>", data = "<player>")]
@@ -69,7 +69,7 @@ fn wager(
     let game = games.get(&game_id)?;
     let wager = wager.into_inner();
     game.wager(wager)?;
-    game.add_round_if_complete(questions.read().get());
+    game.add_round_if_complete(questions.write().get());
     Ok(())
 }
 

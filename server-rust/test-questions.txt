@@ -1,0 +1,3 @@
+What is 2+2?,4
+How many states in the US?,50
+How many feet are in a mile?,5280
