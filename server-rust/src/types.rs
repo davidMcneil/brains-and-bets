@@ -205,7 +205,7 @@ impl Game {
             return Err(Error::PlayerNotFound);
         }
         // Confirm we are collecting guesses for the current round
-        if self.current_round_state() <= RoundState::CollectingGuesses {
+        if self.current_round_state() != RoundState::CollectingGuesses {
             return Err(Error::RoundNotInCollectingGuessesState);
         }
         // Add or replace the answer
