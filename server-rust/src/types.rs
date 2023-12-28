@@ -282,7 +282,6 @@ impl Game {
             }
             None => return Err(Error::PlayerNotFound),
         }
-
         // Add or replace the guess
         round.wagers.add_or_replace(wager);
         Ok(())
