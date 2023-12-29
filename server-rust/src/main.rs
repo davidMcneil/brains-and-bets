@@ -160,6 +160,6 @@ fn rocket() -> _ {
                 get_score,
             ],
         )
-        .manage(Questions::default())
+        .manage(Questions::new(questions))
         .manage(Games::default())
 }
