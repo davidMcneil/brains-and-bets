@@ -33,13 +33,14 @@ export async function getGame(game_name: string) {
 }
 
 
-export async function postAnswer(game_name: string, name: string, answer: string) {
-    const response: Response = await fetch(getBaseServerPath() + game_name + "/answer", {
+export async function postWager(game_name: string, name: string, guess: number | null, wager: number) {
+    const response: Response = await fetch(getBaseServerPath() + game_name + "/wager", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
             player: name,
-            answer: answer,
+            guess: guess,
+            wager: wager,
         })
     })
     return response;
