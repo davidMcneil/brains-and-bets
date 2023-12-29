@@ -5,13 +5,22 @@
 	import { onMount } from 'svelte';
 	import type { Guess } from '$lib/datatypes/Guess';
 	import { compare } from '$lib/datatypes/Guess';
+	import ButtonSet from '$lib/ButtonSet.svelte';
 
 	export let setGameState: (new_state: string) => void;
 	export let name: string | null;
 	export let game_name: string | null;
 	let wager_amount: string = '1';
+	let guess: number;
 
-	function onClickSubmit(guess: number | null) {
+	function onClickSubmit() {
+		if (guess == -1) {
+			postWager(game_name, name, null, parseInt(wager_amount)).then((response) => {
+				if (response.ok) {
+					setGameState('wager_wait');
+				}
+			});
+		}
 		postWager(game_name, name, guess, parseInt(wager_amount)).then((response) => {
 			if (response.ok) {
 				setGameState('wager_wait');
@@ -28,13 +37,11 @@
 			.then((response) => response.json())
 			.then((data) => {
 				current_round = data.rounds[data.rounds.length - 1];
-				console.log(current_round.guesses);
 				current_round.guesses.forEach((guess) => {
 					guesses.push(guess as Guess);
-					console.log('here');
 				});
+				guesses.push({ player: 'lower', guess: -1 } as Guess);
 				guesses = guesses.sort(compare);
-				console.log(guesses);
 			});
 	}
 
@@ -60,12 +67,18 @@
 	<div>
 		<InputField bind:value={wager_amount} text="enter your bet here" />
 	</div>
-	<div>Bet:</div>
-	{#each guesses as guess}
+	<!-- <div>Bet:</div> -->
+	<!-- {#each guesses as guess}
 		<div>
 			<Button text={guess.guess} onClick={() => onClickSubmit(guess.guess)} />
 			{guess.player}
 		</div>
-	{/each}
-	<Button text="lower" onClick={() => onClickSubmit(null)} />
+	{/each} -->
+	<ButtonSet options={guesses} legend={'Select a guess:'} bind:userSelected={guess} />
+	<div>
+		<Button text="Submit" onClick={() => onClickSubmit(guess)} />
+	</div>
+	<div>
+		{guess}
+	</div>
 </main>
