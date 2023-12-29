@@ -68,7 +68,7 @@
 {/if}
 
 <div>
-	<Button text="Reset" onClick={reset} />
+	<Button text="Leave Game" onClick={reset} />
 </div>
 
 <style>

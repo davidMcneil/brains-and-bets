@@ -28,7 +28,6 @@
 				localStorage.setItem('game_name', game_name);
 				setGameState('guess');
 			} else {
-				console.log(response.status);
 				if (response.status == 409) {
 					error_message = game_already_exists_error_message;
 				}
@@ -52,9 +51,7 @@
 				localStorage.setItem('name', name);
 				localStorage.setItem('game_name', game_name);
 				setGameState('guess');
-			} else {
-				console.log('failed to join game ' + game_name);
-			}
+			} 
 		});
 	}
 </script>

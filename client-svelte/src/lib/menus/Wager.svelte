@@ -62,23 +62,10 @@
 <main>
 	<h1>Make a bet.</h1>
 	<div>
-		My score: {my_score}
-	</div>
-	<div>
 		<InputField bind:value={wager_amount} text="enter your bet here" />
 	</div>
-	<!-- <div>Bet:</div> -->
-	<!-- {#each guesses as guess}
-		<div>
-			<Button text={guess.guess} onClick={() => onClickSubmit(guess.guess)} />
-			{guess.player}
-		</div>
-	{/each} -->
 	<ButtonSet options={guesses} legend={'Select a guess:'} bind:userSelected={guess} />
 	<div>
 		<Button text="Submit" onClick={() => onClickSubmit(guess)} />
-	</div>
-	<div>
-		{guess}
 	</div>
 </main>

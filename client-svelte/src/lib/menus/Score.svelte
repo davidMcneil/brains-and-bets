@@ -2,6 +2,8 @@
 	import Button from '$lib/Button.svelte';
 	import { getGame, getScore, getRoundScore } from '$lib/functions/requests';
 	import { onMount } from 'svelte';
+	import { type Guess, compare } from '$lib/datatypes/Guess';
+	import { getClosestGuess } from '$lib/functions/helpers'
 
 	export let setGameState: (new_state: string) => void;
 	export let name: string | null;
@@ -15,6 +17,8 @@
     let round_score_map: Map<string, number> = new Map();
 	let question: string;
 	let answer: string;
+	let guesses: Array<Guess>;
+	let closest_guess: Guess | null;
 
 	async function readScore() {
 		getScore(game_name)
@@ -43,6 +47,9 @@
 			.then((data) => {
 				question = data.rounds[data.rounds.length - 2].question.question;
 				answer = data.rounds[data.rounds.length - 2].question.answer;
+				guesses = data.rounds[data.rounds.length - 2].guesses;
+				guesses = guesses.sort(compare);
+				closest_guess = getClosestGuess(guesses, parseInt(answer));
 			});
 	}
 
@@ -57,6 +64,13 @@
 	<h1>Score</h1>
 	<div>
 		{question}: {answer}
+	</div>
+	<div>
+		{#if closest_guess == null}
+			Everybody guessed over the real answer.
+		{:else}
+			{closest_guess.player} got the closest guess with {closest_guess.guess}
+		{/if}
 	</div>
 	{#each score_map as [player, score]}
 		<div>

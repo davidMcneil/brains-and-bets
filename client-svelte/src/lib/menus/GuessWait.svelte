@@ -11,7 +11,6 @@
 		getGame(game_name)
 			.then((response) => response.json())
 			.then((data) => {
-				console.log(data);
 				players = data.players;
 				rounds = data.rounds;
 				let round = rounds.length - 1;

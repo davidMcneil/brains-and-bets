@@ -50,20 +50,10 @@
 <main>
 	<h1>Make a guess with your brain.</h1>
 	<div>
-		name: {name}
-		game_name: {game_name}
-	</div>
-	<div>
 		{question}
 	</div>
 	<div>
 		<InputField bind:value={guess} text="enter your guess here" />
 		<Button text="submit" onClick={onClickSubmit} />
 	</div>
-	<div>Players:</div>
-	{#each players as player}
-		<div>
-			{player}
-		</div>
-	{/each}
 </main>
