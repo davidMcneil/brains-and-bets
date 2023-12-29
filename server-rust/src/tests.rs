@@ -1,6 +1,6 @@
 use crate::{
     question_lookup::QuestionLookup,
-    types::{Game, Round},
+    types::{Game, GetQuestionLocation, Round},
 };
 use serde_json::from_str;
 use std::{collections::HashMap, io, path::PathBuf};
@@ -212,7 +212,8 @@ fn test_get_score() {
                     }
                 ]
             }
-        ]
+        ],
+        "question_location": "File"
     }"#;
 
     let game: Game = from_str(game_json).expect("Failed to deserialize Game");
@@ -237,10 +238,10 @@ fn test_get_score() {
 fn test_question_lookup() -> io::Result<()> {
     let mut questions = QuestionLookup::default();
     questions.populate_from_file(&PathBuf::from("test-questions.txt"))?;
-    let q1 = questions.get();
-    let q2 = questions.get();
-    let q3 = questions.get();
-    let q4 = questions.get();
+    let q1 = questions.get(GetQuestionLocation::File);
+    let q2 = questions.get(GetQuestionLocation::File);
+    let q3 = questions.get(GetQuestionLocation::File);
+    let q4 = questions.get(GetQuestionLocation::File);
     assert_ne!(q1, q2);
     assert_ne!(q1, q3);
     assert_eq!(q1, q4);

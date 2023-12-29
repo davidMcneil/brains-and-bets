@@ -1,11 +1,12 @@
 use rand::seq::SliceRandom;
+use serde::Deserialize;
 use std::{
     fs::File,
     io::{self, BufRead, BufReader},
     path::Path,
 };
 
-use crate::types::Question;
+use crate::types::{GetQuestionLocation, Question};
 
 const DEFAULT_QUESTION: &str = "What question would you like to be asked?";
 
@@ -13,6 +14,15 @@ const DEFAULT_QUESTION: &str = "What question would you like to be asked?";
 pub(crate) struct QuestionLookup {
     questions: Vec<Question>,
     question_idx: usize,
+}
+
+#[allow(dead_code)]
+#[derive(Deserialize, Debug)]
+struct NumbersApiResponse {
+    text: String,
+    number: u32,
+    found: bool,
+    r#type: String,
 }
 
 impl QuestionLookup {
@@ -34,18 +44,43 @@ impl QuestionLookup {
         Ok(())
     }
 
-    pub(crate) fn get(&mut self) -> Question {
-        if self.questions.is_empty() {
-            return Question {
-                question: String::from(DEFAULT_QUESTION),
-                answer: 0,
-            };
+    pub(crate) fn get(&mut self, get_question_from: GetQuestionLocation) -> Question {
+        match get_question_from {
+            GetQuestionLocation::File => {
+                if self.questions.is_empty() {
+                    return Question {
+                        question: String::from(DEFAULT_QUESTION),
+                        answer: 0,
+                    };
+                }
+                let question = self.questions[self.question_idx].clone();
+                self.question_idx += 1;
+                if self.question_idx == self.questions.len() {
+                    self.question_idx = 0;
+                }
+                question
+            }
+            GetQuestionLocation::NumbersApi => {
+                for _ in 0..5 {
+                    if let Ok(question) = get_question_from_numbers_api() {
+                        return question;
+                    }
+                }
+                self.get(GetQuestionLocation::File)
+            }
         }
-        let question = self.questions[self.question_idx].clone();
-        self.question_idx += 1;
-        if self.question_idx == self.questions.len() {
-            self.question_idx = 0;
-        }
-        question
     }
+}
+
+fn get_question_from_numbers_api() -> Result<Question, reqwest::Error> {
+    let numbers_api_response: NumbersApiResponse =
+        reqwest::blocking::get("http://numbersapi.com/random/trivia?json")?.json()?;
+    let mut question = numbers_api_response.text;
+    question = question.replace(&numbers_api_response.number.to_string(), "What");
+    question.pop();
+    question.push('?');
+    Ok(Question {
+        question,
+        answer: numbers_api_response.number,
+    })
 }

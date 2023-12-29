@@ -74,6 +74,14 @@ pub(crate) struct PlayerData {
     pub player: Player,
 }
 
+#[derive(Deserialize, Serialize)]
+pub(crate) struct CreateGameData {
+    /// The player with which the request is associated
+    pub player: Player,
+    /// The location to get questions from
+    pub get_questions_from: GetQuestionLocation,
+}
+
 #[derive(Clone, Deserialize, Serialize, Debug, PartialEq, Eq)]
 pub(crate) struct Question {
     /// The question for the round
@@ -214,6 +222,8 @@ pub(crate) struct Game {
     pub players: HashSet<Player>,
     /// The list of rounds in the game with the most recent round being the last item in the list
     pub rounds: Vec<Round>,
+    /// The location to get questions from
+    pub question_location: GetQuestionLocation,
 }
 
 impl Game {
@@ -342,11 +352,15 @@ impl Games {
         game_id: String,
         initial_player: Player,
         question: Question,
+        get_questions_from: GetQuestionLocation,
     ) -> Result<()> {
         if self.0.contains_key(&game_id) {
             Err(Error::GameConflict)
         } else {
-            let mut game = Game::default();
+            let mut game = Game {
+                question_location: get_questions_from,
+                ..Default::default()
+            };
             game.add_round_if_complete(question);
             game.add_player(initial_player)?;
             self.0.insert(game_id, game);
@@ -361,4 +375,11 @@ impl Games {
     pub(crate) fn delete(&mut self, game_id: &str) {
         self.0.remove(game_id);
     }
+}
+
+#[derive(Default, Clone, Copy, Deserialize, Serialize, Debug)]
+pub(crate) enum GetQuestionLocation {
+    #[default]
+    File,
+    NumbersApi,
 }

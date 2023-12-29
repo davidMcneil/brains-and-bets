@@ -13,7 +13,7 @@ use rocket_cors::{AllowedOrigins, CorsOptions};
 use std::net::IpAddr;
 use std::path::PathBuf;
 use structopt::StructOpt;
-use types::{Game, Guess, PlayerData, Result, Scores, Wager};
+use types::{CreateGameData, Game, Guess, PlayerData, Result, Scores, Wager};
 
 type Games = Mutex<types::Games>;
 type Questions = RwLock<QuestionLookup>;
@@ -23,16 +23,21 @@ fn heartbeat() -> &'static str {
     "heartbeat"
 }
 
-#[put("/game/<game_id>", data = "<player>")]
+#[put("/game/<game_id>", data = "<create_game_data>")]
 fn create_game(
     game_id: String,
-    player: Json<PlayerData>,
+    create_game_data: Json<CreateGameData>,
     games: &State<Games>,
     questions: &State<Questions>,
 ) -> Result<()> {
     let mut games = games.lock();
-    let player = player.into_inner();
-    games.create(game_id, player.player, questions.write().get())
+    let player = create_game_data.player.clone();
+    games.create(
+        game_id,
+        player,
+        questions.write().get(create_game_data.get_questions_from),
+        create_game_data.get_questions_from,
+    )
 }
 
 #[post("/game/<game_id>", data = "<player>")]
@@ -69,7 +74,7 @@ fn wager(
     let game = games.get(&game_id)?;
     let wager = wager.into_inner();
     game.wager(wager)?;
-    game.add_round_if_complete(questions.write().get());
+    game.add_round_if_complete(questions.write().get(game.question_location));
     Ok(())
 }
 
