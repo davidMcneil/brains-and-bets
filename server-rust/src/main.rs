@@ -94,6 +94,17 @@ fn get_score(game_id: String, games: &State<Games>) -> Result<Json<Scores>> {
     Ok(Json(game.get_score()))
 }
 
+#[get("/game/<game_id>/round_score")]
+fn get_round_score(game_id: String, games: &State<Games>) -> Result<Json<Scores>> {
+    let mut games = games.lock();
+    let game = games.get(&game_id)?.clone();
+    let round = game.rounds.get(game.rounds.len() - 2);
+    match round {
+        None => Ok(Json(Scores::new())),
+        Some(round) => Ok(Json(round.get_score_changes(3, 1))),
+    }
+}
+
 #[derive(Debug, StructOpt)]
 struct Opt {
     /// The path to a file containing newline delimited questions.
@@ -158,6 +169,7 @@ fn rocket() -> _ {
                 exit_game,
                 delete_game,
                 get_score,
+                get_round_score,
             ],
         )
         .manage(Questions::new(questions))
