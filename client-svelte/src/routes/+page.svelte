@@ -4,6 +4,7 @@
 	import GuessWait from '$lib/menus/GuessWait.svelte';
 	import Join from '$lib/menus/Join.svelte';
 	import Score from '$lib/menus/Score.svelte';
+	import ScoreHeader from '$lib/menus/ScoreHeader.svelte';
 	import Wager from '$lib/menus/Wager.svelte';
 	import WagerWait from '$lib/menus/WagerWait.svelte';
 	import { onMount } from 'svelte';
@@ -39,7 +40,14 @@
 	function reset() {
 		setGameState('join');
 	}
+
+    let score_header_states_array = ["guess", "guess_wait", "wager", "wager_wait", "score"];
+    let score_header_states: Set<string> = new Set(score_header_states_array);
 </script>
+
+{#if score_header_states.has(game_state)}
+<ScoreHeader name={localStorage.getItem("name")} game_name={localStorage.getItem("game_name")} />
+{/if}
 
 {#if game_state == 'join'}
 	<Join {setGameState} />
