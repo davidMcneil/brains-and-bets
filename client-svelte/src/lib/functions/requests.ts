@@ -80,6 +80,14 @@ export async function getScore(game_name: string) {
     return response;
 }
 
+export async function getRoundScore(game_name: string) { // gets the change in score for the last round
+    const response: Response = await fetch(getBaseServerPath() + game_name + "/round_score", {
+        method: "GET",
+        headers: {"Content-Type": "application/json"},
+    })
+    return response;
+}
+
 export function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }

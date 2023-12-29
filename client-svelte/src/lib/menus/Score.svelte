@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/Button.svelte';
-	import { getGame, getScore } from '$lib/functions/requests';
+	import { getGame, getScore, getRoundScore } from '$lib/functions/requests';
 	import { onMount } from 'svelte';
 
 	export let setGameState: (new_state: string) => void;
@@ -12,6 +12,7 @@
 	}
 
 	let score_map: Map<string, number> = new Map();
+    let round_score_map: Map<string, number> = new Map();
 	let question: string;
 	let answer: string;
 
@@ -26,6 +27,16 @@
 			});
 	}
 
+	async function readRoundScore() {
+		getRoundScore(game_name)
+			.then((response) => response.json())
+			.then((data) => {
+				for (var property in data) {
+					round_score_map = round_score_map.set(property, data[property]);
+				}
+			});
+	}
+
 	async function readGame() {
 		getGame(game_name)
 			.then((response) => response.json())
@@ -37,6 +48,7 @@
 
 	onMount(() => {
 		readScore();
+        readRoundScore();
 		readGame();
 	});
 </script>
@@ -48,8 +60,10 @@
 	</div>
 	{#each score_map as [player, score]}
 		<div>
-			{player}
+			{player}: 
 			{score}
+            change in score:
+            {round_score_map.get(player)}
 		</div>
 	{/each}
 	<Button text="Continue" onClick={onClickContinue} />
