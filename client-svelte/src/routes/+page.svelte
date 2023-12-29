@@ -4,6 +4,7 @@
 	import GuessWait from '$lib/menus/GuessWait.svelte';
 	import Join from '$lib/menus/Join.svelte';
 	import Wager from '$lib/menus/Wager.svelte';
+	import WagerWait from '$lib/menus/WagerWait.svelte';
 	import { onMount } from 'svelte';
 
 	let game_state: string | null;
@@ -52,7 +53,7 @@
 {:else if game_state == 'wager'}
 	<Wager {setGameState} name={localStorage.getItem('name')} game_name={localStorage.getItem('game_name')} />
 {:else if game_state == 'wager_wait'}
-    wager wait
+    <WagerWait {setGameState} game_name={localStorage.getItem('game_name')} />
 {:else if game_state == 'score'}
 	score
 {/if}
