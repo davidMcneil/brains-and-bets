@@ -59,11 +59,14 @@ export async function postAnswer(game_name: string, name: string, answer: string
 // }
 
 
-export async function postGuess(game_name: string, guess: Guess) {
+export async function postGuess(game_name: string, name: string, guess: number) {
     const response: Response = await fetch(getBaseServerPath() + game_name + "/guess", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(guess),
+        body: JSON.stringify({
+            player: name,
+            guess: guess,
+        }),
     })
     return response;
 }
@@ -74,4 +77,8 @@ export async function getScore(game_name: string) {
         headers: {"Content-Type": "application/json"},
     })
     return response;
+}
+
+export function sleep(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
