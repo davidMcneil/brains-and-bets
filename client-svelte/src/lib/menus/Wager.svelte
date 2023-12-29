@@ -2,8 +2,9 @@
 	import Button from '$lib/Button.svelte';
 	import InputField from '$lib/InputField.svelte';
 	import { getGame, postWager, getScore } from '$lib/functions/requests';
-	import { text } from '@sveltejs/kit';
 	import { onMount } from 'svelte';
+	import type { Guess } from '$lib/datatypes/Guess';
+	import { compare } from '$lib/datatypes/Guess';
 
 	export let setGameState: (new_state: string) => void;
 	export let name: string | null;
@@ -18,21 +19,22 @@
 		});
 	}
 
-	let players: Array<string> = [];
-	let rounds: Array<object>;
-    let current_round: object;
-    let guesses: Array<object> = [];
-    let my_score: number;
+	let current_round: object;
+	let guesses: Array<Guess> = [];
+	let my_score: number;
 
 	async function readGameState() {
 		getGame(game_name)
 			.then((response) => response.json())
 			.then((data) => {
-				players = data.players;
-				rounds = data.rounds;
-                current_round = data.rounds[data.rounds.length - 1];
-                guesses = current_round.guesses;
-                guesses.sort();
+				current_round = data.rounds[data.rounds.length - 1];
+				console.log(current_round.guesses);
+				current_round.guesses.forEach((guess) => {
+					guesses.push(guess as Guess);
+					console.log('here');
+				});
+				guesses = guesses.sort(compare);
+				console.log(guesses);
 			});
 	}
 
@@ -40,36 +42,30 @@
 		getScore(game_name)
 			.then((response) => response.json())
 			.then((data) => {
-                my_score = data[name];
+				my_score = data[name];
 			});
 	}
 
 	onMount(() => {
 		readGameState();
-        readScore();        
+		readScore();
 	});
 </script>
 
 <main>
 	<h1>Make a bet.</h1>
 	<div>
-		name: {name}
-		game_name: {game_name}
+		My score: {my_score}
 	</div>
-    <div>
-        My score: {my_score}
-    </div>
 	<div>
 		<InputField bind:value={wager_amount} text="enter your bet here" />
 	</div>
-	<div>Guess:</div>
+	<div>Bet:</div>
 	{#each guesses as guess}
 		<div>
-			{guess.player} {guess.guess}
+			<Button text={guess.guess} onClick={() => onClickSubmit(guess.guess)} />
+			{guess.player}
 		</div>
-        <div>
-            <Button text="{guess.guess}" onClick={() => onClickSubmit(guess.guess)}/>
-        </div>
 	{/each}
-    <Button text="lower" onClick={() => onClickSubmit(null)} />
+	<Button text="lower" onClick={() => onClickSubmit(null)} />
 </main>
