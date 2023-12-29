@@ -7,7 +7,8 @@ export async function putCreateGame(game_name: string, name: string) {
         method: "PUT",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({
-            player: name
+            player: name,
+            get_questions_from: "NumbersApi"
         })
     })
     return response;
