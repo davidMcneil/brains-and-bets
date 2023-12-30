@@ -4,6 +4,7 @@ use std::{
     fs::File,
     io::{self, BufRead, BufReader},
     path::Path,
+    sync::atomic::{AtomicUsize, Ordering},
 };
 
 use crate::types::{GetQuestionLocation, Question};
@@ -13,7 +14,7 @@ const DEFAULT_QUESTION: &str = "What question would you like to be asked?";
 #[derive(Default)]
 pub(crate) struct QuestionLookup {
     questions: Vec<Question>,
-    question_idx: usize,
+    question_idx: AtomicUsize,
 }
 
 #[allow(dead_code)]
@@ -44,37 +45,49 @@ impl QuestionLookup {
         Ok(())
     }
 
-    pub(crate) fn get(&mut self, get_question_from: GetQuestionLocation) -> Question {
+    pub(crate) async fn get(&self, get_question_from: GetQuestionLocation) -> Question {
         match get_question_from {
-            GetQuestionLocation::File => {
-                if self.questions.is_empty() {
-                    return Question {
-                        question: String::from(DEFAULT_QUESTION),
-                        answer: 0,
-                    };
-                }
-                let question = self.questions[self.question_idx].clone();
-                self.question_idx += 1;
-                if self.question_idx == self.questions.len() {
-                    self.question_idx = 0;
-                }
-                question
-            }
+            GetQuestionLocation::File => self.get_from_file(),
             GetQuestionLocation::NumbersApi => {
                 for _ in 0..5 {
-                    if let Ok(question) = get_question_from_numbers_api() {
+                    if let Ok(question) = get_question_from_numbers_api().await {
                         return question;
                     }
                 }
-                self.get(GetQuestionLocation::File)
+                self.get_from_file()
             }
         }
     }
+
+    pub(crate) fn get_from_file(&self) -> Question {
+        if self.questions.is_empty() {
+            return Question {
+                question: String::from(DEFAULT_QUESTION),
+                answer: 0,
+            };
+        }
+        let index = self
+            .question_idx
+            .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |v| {
+                Some(if v >= self.questions.len() - 1 {
+                    0
+                } else {
+                    v + 1
+                })
+            });
+        let index = match index {
+            Ok(v) | Err(v) => v,
+        };
+        self.questions[index].clone()
+    }
 }
 
-fn get_question_from_numbers_api() -> Result<Question, reqwest::Error> {
+async fn get_question_from_numbers_api() -> Result<Question, reqwest::Error> {
     let numbers_api_response: NumbersApiResponse =
-        reqwest::blocking::get("http://numbersapi.com/random/trivia?json")?.json()?;
+        reqwest::get("http://numbersapi.com/random/trivia?json")
+            .await?
+            .json()
+            .await?;
     let mut question = numbers_api_response.text;
     question = question.replace(&numbers_api_response.number.to_string(), "What");
     question.pop();

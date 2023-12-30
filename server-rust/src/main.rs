@@ -3,10 +3,15 @@ mod question_lookup;
 mod tests;
 mod types;
 
-use parking_lot::{Mutex, RwLock};
 use question_lookup::QuestionLookup;
 use rocket::{
-    self, config::LogLevel, delete, get, http::Method, post, put, routes, serde::json::Json,
+    self,
+    config::LogLevel,
+    delete, get,
+    http::Method,
+    post, put, routes,
+    serde::json::Json,
+    tokio::sync::{Mutex, RwLock},
     Config, State,
 };
 use rocket_cors::{AllowedOrigins, CorsOptions};
@@ -24,84 +29,90 @@ fn heartbeat() -> &'static str {
 }
 
 #[put("/game/<game_id>", data = "<create_game_data>")]
-fn create_game(
+async fn create_game(
     game_id: String,
     create_game_data: Json<CreateGameData>,
     games: &State<Games>,
     questions: &State<Questions>,
 ) -> Result<()> {
-    let mut games = games.lock();
+    let question = questions
+        .read()
+        .await
+        .get(create_game_data.get_questions_from)
+        .await;
+    let mut games = games.lock().await;
     let player = create_game_data.player.clone();
     games.create(
         game_id,
         player,
-        questions.write().get(create_game_data.get_questions_from),
+        question,
         create_game_data.get_questions_from,
     )
 }
 
 #[post("/game/<game_id>", data = "<player>")]
-fn join_game(game_id: String, player: Json<PlayerData>, games: &State<Games>) -> Result<()> {
-    let mut games = games.lock();
+async fn join_game(game_id: String, player: Json<PlayerData>, games: &State<Games>) -> Result<()> {
+    let mut games = games.lock().await;
     let game = games.get(&game_id)?;
     let player = player.into_inner();
     game.add_player(player.player)
 }
 
 #[get("/game/<game_id>")]
-fn game(game_id: String, games: &State<Games>) -> Result<Json<Game>> {
-    let mut games = games.lock();
+async fn game(game_id: String, games: &State<Games>) -> Result<Json<Game>> {
+    let mut games = games.lock().await;
     let game = games.get(&game_id)?;
     Ok(Json(game.clone()))
 }
 
 #[post("/game/<game_id>/guess", data = "<guess>")]
-fn guess(game_id: String, guess: Json<Guess>, games: &State<Games>) -> Result<()> {
-    let mut games = games.lock();
+async fn guess(game_id: String, guess: Json<Guess>, games: &State<Games>) -> Result<()> {
+    let mut games = games.lock().await;
     let game = games.get(&game_id)?;
     let guess = guess.into_inner();
     game.guess(guess)
 }
 
 #[post("/game/<game_id>/wager", data = "<wager>")]
-fn wager(
+async fn wager(
     game_id: String,
     wager: Json<Wager>,
     games: &State<Games>,
     questions: &State<Questions>,
 ) -> Result<()> {
-    let mut games = games.lock();
+    let mut games = games.lock().await;
     let game = games.get(&game_id)?;
+    let question = questions.read().await.get(game.question_location).await;
     let wager = wager.into_inner();
     game.wager(wager)?;
-    game.add_round_if_complete(questions.write().get(game.question_location));
+    game.add_round_if_complete(question);
     Ok(())
 }
 
 #[delete("/game/<game_id>/exit", data = "<player>")]
-fn exit_game(game_id: String, player: Json<PlayerData>, games: &State<Games>) -> Result<()> {
-    let mut games = games.lock();
+async fn exit_game(game_id: String, player: Json<PlayerData>, games: &State<Games>) -> Result<()> {
+    let mut games = games.lock().await;
     let game = games.get(&game_id)?;
     let player = player.into_inner();
     game.remove_player(player.player)
 }
 
 #[delete("/game/<game_id>")]
-fn delete_game(game_id: String, games: &State<Games>) {
-    let mut games = games.lock();
+async fn delete_game(game_id: String, games: &State<Games>) {
+    let mut games = games.lock().await;
     games.delete(&game_id)
 }
 
 #[get("/game/<game_id>/score")]
-fn get_score(game_id: String, games: &State<Games>) -> Result<Json<Scores>> {
-    let mut games = games.lock();
+async fn get_score(game_id: String, games: &State<Games>) -> Result<Json<Scores>> {
+    let mut games = games.lock().await;
     let game = games.get(&game_id)?.clone();
     Ok(Json(game.get_score()))
 }
 
 #[get("/game/<game_id>/round_score")]
-fn get_round_score(game_id: String, games: &State<Games>) -> Result<Json<Scores>> {
-    let mut games = games.lock();
+async fn get_round_score(game_id: String, games: &State<Games>) -> Result<Json<Scores>> {
+    let mut games = games.lock().await;
     let game = games.get(&game_id)?.clone();
     let round = game.rounds.get(game.rounds.len() - 2);
     match round {
