@@ -77,7 +77,7 @@
 	/>
 {/if}
 
-<div>
+<div style="padding-top: 10em;">
 	<Button text="Leave Game" onClick={reset} />
 </div>
 
