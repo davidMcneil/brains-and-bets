@@ -59,7 +59,7 @@ What is the weight of the largest recorded elephant? kilograms,12000
 How many continents are there on Earth? ,7
 What is the average length of the Nile River? kilometers,6650
 In what year was the first color television broadcast? ,1954
-How many dots are there on a standard six-sided die? ,21
+How many dots are there on a standard six-sided die?,21
 What is the world record for the most dominoes toppled in a chain reaction? ,4491863
 How many gallons of water does the average person use per day? ,80
 What is the average lifespan of a mosquito?days,14
