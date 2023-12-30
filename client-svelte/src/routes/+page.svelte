@@ -38,15 +38,17 @@
 	}
 
 	function reset() {
-		setGameState('join');
+		if (confirm('Do you really want to leave the game?') == true) {
+			setGameState('join');
+		}
 	}
 
-    let score_header_states_array = ["guess", "guess_wait", "wager", "wager_wait", "score"];
-    let score_header_states: Set<string> = new Set(score_header_states_array);
+	let score_header_states_array = ['guess', 'guess_wait', 'wager', 'wager_wait', 'score'];
+	let score_header_states: Set<string> = new Set(score_header_states_array);
 </script>
 
 {#if score_header_states.has(game_state)}
-<ScoreHeader name={localStorage.getItem("name")} game_name={localStorage.getItem("game_name")} />
+	<ScoreHeader name={localStorage.getItem('name')} game_name={localStorage.getItem('game_name')} />
 {/if}
 
 {#if game_state == 'join'}
@@ -60,11 +62,19 @@
 {:else if game_state == 'guess_wait'}
 	<GuessWait {setGameState} game_name={localStorage.getItem('game_name')} />
 {:else if game_state == 'wager'}
-	<Wager {setGameState} name={localStorage.getItem('name')} game_name={localStorage.getItem('game_name')} />
+	<Wager
+		{setGameState}
+		name={localStorage.getItem('name')}
+		game_name={localStorage.getItem('game_name')}
+	/>
 {:else if game_state == 'wager_wait'}
-    <WagerWait {setGameState} game_name={localStorage.getItem('game_name')} />
+	<WagerWait {setGameState} game_name={localStorage.getItem('game_name')} />
 {:else if game_state == 'score'}
-	<Score {setGameState} name={localStorage.getItem('name')} game_name={localStorage.getItem('game_name')} />
+	<Score
+		{setGameState}
+		name={localStorage.getItem('name')}
+		game_name={localStorage.getItem('game_name')}
+	/>
 {/if}
 
 <div>
