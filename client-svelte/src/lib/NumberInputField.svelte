@@ -3,4 +3,4 @@
 	export let value = '';
 </script>
 
-<input bind:value placeholder={text} />
+<input type="number" bind:value placeholder={text} />

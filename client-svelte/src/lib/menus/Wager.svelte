@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Button from '$lib/Button.svelte';
-	import InputField from '$lib/InputField.svelte';
 	import { getGame, postWager, getScore } from '$lib/functions/requests';
 	import { onMount } from 'svelte';
 	import type { Guess } from '$lib/datatypes/Guess';
 	import { compare } from '$lib/datatypes/Guess';
 	import ButtonSet from '$lib/ButtonSet.svelte';
+	import NumberInputField from '$lib/NumberInputField.svelte';
 
 	export let setGameState: (new_state: string) => void;
 	export let name: string | null;
@@ -58,7 +58,7 @@
 	<h1>Make a bet.</h1>
 	<h3>Make a wager no more than {my_score}</h3>
 	<div style="padding-bottom: 1em;">
-		<InputField bind:value={wager_amount} text="enter your bet here" />
+		<NumberInputField bind:value={wager_amount} text="enter your bet here" />
 	</div>
 	<div>{question}</div>
 	<ButtonSet options={guesses} legend={'Select a guess:'} bind:userSelected={guess} />

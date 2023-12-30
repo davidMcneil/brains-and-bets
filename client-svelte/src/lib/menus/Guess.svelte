@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/Button.svelte';
-	import InputField from '$lib/InputField.svelte';
+	import NumberInputField from '$lib/NumberInputField.svelte';
 	import { getGame, postGuess, sleep } from '$lib/functions/requests';
 	import { onMount } from 'svelte';
 
@@ -53,7 +53,7 @@
 		{question}
 	</div>
 	<div>
-		<InputField bind:value={guess} text="enter your guess here" />
+		<NumberInputField bind:value={guess} text="enter your guess here" />
 		<Button text="submit" onClick={onClickSubmit} />
 	</div>
 </main>
