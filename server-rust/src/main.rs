@@ -117,7 +117,7 @@ async fn get_round_score(game_id: String, games: &State<Games>) -> Result<Json<S
     let round = game.rounds.get(game.rounds.len() - 2);
     match round {
         None => Ok(Json(Scores::new())),
-        Some(round) => Ok(Json(round.get_score_changes(3, 1))),
+        Some(round) => Ok(Json(round.get_score_changes(2, 3))),
     }
 }
 

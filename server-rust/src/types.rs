@@ -332,7 +332,7 @@ impl Game {
             self.rounds.len() - 1
         };
         for round in &self.rounds[..last_round_to_score] {
-            let round_score_changes = round.get_score_changes(3, 1);
+            let round_score_changes = round.get_score_changes(2, 3);
             for (player, round_score_change) in &round_score_changes {
                 let score = scores.entry(player.clone()).or_insert(1);
                 *score += round_score_change;

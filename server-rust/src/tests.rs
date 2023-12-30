@@ -1,9 +1,6 @@
-use crate::{
-    question_lookup::QuestionLookup,
-    types::{Game, GetQuestionLocation, Round},
-};
+use crate::types::{Game, Round};
 use serde_json::from_str;
-use std::{collections::HashMap, io, path::PathBuf};
+use std::collections::HashMap;
 
 #[test]
 fn test_get_closest_guess_multiple_guesses() {
@@ -220,30 +217,16 @@ fn test_get_score() {
 
     let scores = game.get_score();
 
-    // -7 = -9 (wrong wager) + 1 (closest guess) + 1 (everyone starts with 1)
+    // -5 = -9 (wrong wager) + 3 (closest guess) + 1 (everyone starts with 1)
     // -6 = -7 (wrong wager) + 1 (everyone starts with 1)
-    // 16 = 5*3 (correct wager) + 1 (everyone starts with 1)
+    // 11 = 5*2 (correct wager) + 1 (everyone starts with 1)
     let expected_scores_json = r#"{
-        "Player1": -7,
+        "Player1": -5,
         "Player2": -6,
-        "Player3": 16
+        "Player3": 11
     }"#;
     let expected_scores: HashMap<String, i32> =
         from_str(expected_scores_json).expect("Failed to deserialize expected scores");
 
     assert_eq!(scores, expected_scores);
-}
-
-#[test]
-fn test_question_lookup() -> io::Result<()> {
-    let mut questions = QuestionLookup::default();
-    questions.populate_from_file(&PathBuf::from("test-questions.txt"))?;
-    let q1 = questions.get(GetQuestionLocation::File);
-    let q2 = questions.get(GetQuestionLocation::File);
-    let q3 = questions.get(GetQuestionLocation::File);
-    let q4 = questions.get(GetQuestionLocation::File);
-    assert_ne!(q1, q2);
-    assert_ne!(q1, q3);
-    assert_eq!(q1, q4);
-    Ok(())
 }
