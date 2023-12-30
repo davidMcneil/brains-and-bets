@@ -44,10 +44,38 @@
 
 <main>
 	<h3>Scores</h3>
-	{#each score_map as [player, score]}
-		<div>
-			{player}:
-			{score}
-		</div>
-	{/each}
+	<div class="score_cards">
+		{#each score_map as [player, score]}
+			<div class="score_card">
+				<div>
+					{player}:
+				</div>
+				<div>
+					{score}
+				</div>
+			</div>
+		{/each}
+	</div>
 </main>
+
+<style>
+	.score_cards {
+		display: flex;
+		padding: 0.1em 0em;
+	}
+
+	.score_card {
+		padding: 0.6em 1em;
+		line-height: 1.3em;
+		appearance: none;
+		background: none;
+		font-weight: 600;
+		font-size: 1em;
+		color: var(--gray);
+		border: 1px solid var(--gray);
+		border-radius: 0;
+		outline: none;
+		cursor: pointer;
+		text-align: center;
+	}
+</style>
