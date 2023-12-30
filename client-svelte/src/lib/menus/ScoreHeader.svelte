@@ -21,11 +21,11 @@
 			});
 	}
 
-    async function readScoreLoop() {
-        readScore();
-        await sleep(1000);
-        readScoreLoop();
-    }
+	async function readScoreLoop() {
+		readScore();
+		await sleep(1000);
+		readScoreLoop();
+	}
 
 	async function readGame() {
 		getGame(game_name)
@@ -44,10 +44,10 @@
 
 <main>
 	<div>Scores:</div>
-	<div>
-		{#each score_map as [player, score]}
+	{#each score_map as [player, score]}
+		<div>
 			{player}:
 			{score}
-		{/each}
-	</div>
+		</div>
+	{/each}
 </main>
