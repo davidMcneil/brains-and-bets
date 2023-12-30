@@ -219,11 +219,11 @@ fn test_get_score() {
 
     // -5 = -9 (wrong wager) + 3 (closest guess) + 1 (everyone starts with 1)
     // -6 = -7 (wrong wager) + 1 (everyone starts with 1)
-    // 11 = 5*2 (correct wager) + 1 (everyone starts with 1)
+    // 16 = 5*3 (correct wager) + 1 (everyone starts with 1)
     let expected_scores_json = r#"{
         "Player1": -5,
         "Player2": -6,
-        "Player3": 11
+        "Player3": 16
     }"#;
     let expected_scores: HashMap<String, i32> =
         from_str(expected_scores_json).expect("Failed to deserialize expected scores");
