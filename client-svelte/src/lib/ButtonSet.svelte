@@ -21,23 +21,17 @@
 >
 	<div class="legend" id={`label-${uniqueID}`}>{legend}</div>
 	<div class="options">
-		{#each options as { player, guess} }
+		{#each options as { player, guess }}
 			<div class="option">
-				<input
-					class="sr-only"
-					type="radio"
-					id={player}
-					bind:group={userSelected}
-					value={guess}
-				/>
-				<label class="option" for={player}> {player + ": " + guess} </label>
+				<input class="sr-only" type="radio" id={player} bind:group={userSelected} value={guess} />
+				<label class="option" for={player}> {player + (guess ? ': ' + guess : '')} </label>
 			</div>
 		{/each}
 	</div>
 </div>
 
 <style>
-    /* @import "../app.css"; */
+	/* @import "../app.css"; */
 	:root {
 		--accent-color: CornflowerBlue;
 		--gray: #ccc;
@@ -84,7 +78,7 @@
 
 	.options {
 		display: flex;
-        padding: 1.0em 0em;
+		padding: 1em 0em;
 	}
 
 	.option > label {

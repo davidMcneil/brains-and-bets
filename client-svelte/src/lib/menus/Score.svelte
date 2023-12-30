@@ -3,7 +3,7 @@
 	import { getGame, getScore, getRoundScore } from '$lib/functions/requests';
 	import { onMount } from 'svelte';
 	import { type Guess, compare } from '$lib/datatypes/Guess';
-	import { getClosestGuess } from '$lib/functions/helpers'
+	import { getClosestGuess } from '$lib/functions/helpers';
 
 	export let setGameState: (new_state: string) => void;
 	export let name: string | null;
@@ -14,7 +14,7 @@
 	}
 
 	let score_map: Map<string, number> = new Map();
-    let round_score_map: Map<string, number> = new Map();
+	let round_score_map: Map<string, number> = new Map();
 	let question: string;
 	let answer: string;
 	let guesses: Array<Guess>;
@@ -55,16 +55,29 @@
 
 	onMount(() => {
 		readScore();
-        readRoundScore();
+		readRoundScore();
 		readGame();
 	});
 </script>
 
 <main>
-	<h1>Score</h1>
+	<h2>Scores</h2>
+	{#each score_map as [player, score]}
+		<div>
+			{player}:
+			{score}
+			(change in score:
+			{round_score_map.get(player) + (round_score_map.get(player) > 0 ? ' ✅' : ' ❌')})
+		</div>
+	{/each}
+
+	<h2>Question and Answer</h2>
 	<div>
-		{question}: {answer}
+		{question}
+		<h3>{answer}</h3>
 	</div>
+
+	<h2>Closest Guess</h2>
 	<div>
 		{#if closest_guess == null}
 			Everybody guessed over the real answer.
@@ -72,13 +85,6 @@
 			{closest_guess.player} got the closest guess with {closest_guess.guess}
 		{/if}
 	</div>
-	{#each score_map as [player, score]}
-		<div>
-			{player}: 
-			{score}
-            change in score:
-            {round_score_map.get(player)}
-		</div>
-	{/each}
+
 	<Button text="Continue" onClick={onClickContinue} />
 </main>

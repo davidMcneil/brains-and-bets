@@ -43,7 +43,7 @@
 		}
 	}
 
-	let score_header_states_array = ['guess', 'guess_wait', 'wager', 'wager_wait', 'score'];
+	let score_header_states_array = ['guess', 'guess_wait', 'wager', 'wager_wait'];
 	let score_header_states: Set<string> = new Set(score_header_states_array);
 </script>
 

@@ -11,16 +11,9 @@
 	export let name: string | null;
 	export let game_name: string | null;
 	let wager_amount: string = '1';
-	let guess: number;
+	let guess: number = null;
 
 	function onClickSubmit() {
-		if (guess == -1) {
-			postWager(game_name, name, null, parseInt(wager_amount)).then((response) => {
-				if (response.ok) {
-					setGameState('wager_wait');
-				}
-			});
-		}
 		postWager(game_name, name, guess, parseInt(wager_amount)).then((response) => {
 			if (response.ok) {
 				setGameState('wager_wait');
@@ -40,7 +33,7 @@
 				current_round.guesses.forEach((guess) => {
 					guesses.push(guess as Guess);
 				});
-				guesses.push({ player: 'lower', guess: -1 } as Guess);
+				guesses.push({ player: 'lower', guess: null } as Guess);
 				guesses = guesses.sort(compare);
 			});
 	}
@@ -61,7 +54,8 @@
 
 <main>
 	<h1>Make a bet.</h1>
-	<div>
+	<h3>Make a wager no more than {my_score}</h3>
+	<div style="padding-bottom: 1em;">
 		<InputField bind:value={wager_amount} text="enter your bet here" />
 	</div>
 	<ButtonSet options={guesses} legend={'Select a guess:'} bind:userSelected={guess} />

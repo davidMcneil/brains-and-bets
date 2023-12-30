@@ -43,7 +43,7 @@
 </script>
 
 <main>
-	<div>Scores:</div>
+	<h3>Scores</h3>
 	{#each score_map as [player, score]}
 		<div>
 			{player}:
