@@ -45,7 +45,15 @@
 
 	let score_header_states_array = ['guess', 'guess_wait', 'wager', 'wager_wait'];
 	let score_header_states: Set<string> = new Set(score_header_states_array);
+
+	function beforeUnload() {
+		event.preventDefault();
+		event.returnValue = '';
+		return '';
+	}
 </script>
+  
+<svelte:window on:beforeunload={beforeUnload}/> 
 
 {#if score_header_states.has(game_state)}
 	<ScoreHeader name={localStorage.getItem('name')} game_name={localStorage.getItem('game_name')} />
