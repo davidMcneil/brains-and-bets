@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/Button.svelte';
+	import Range from '$lib/Range.svelte';
 	import { getGame, postWager, getScore } from '$lib/functions/requests';
 	import { onMount } from 'svelte';
 	import type { Guess } from '$lib/datatypes/Guess';
@@ -58,7 +59,10 @@
 	<h1>Make a bet.</h1>
 	<h3>Make a wager no more than {my_score}</h3>
 	<div style="padding-bottom: 1em;">
-		<NumberInputField bind:value={wager_amount} text="enter your bet here" />
+		<NumberInputField bind:value={wager_amount} text="enter your bet here"/>
+	</div>
+	<div>
+		<Range min={1} max={my_score} initialValue={1} on:change={(e) => wager_amount = e.detail.value}/>
 	</div>
 	<div>{question}</div>
 	<ButtonSet options={guesses} legend={'Select a guess:'} bind:userSelected={guess} />
