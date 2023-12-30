@@ -77,8 +77,12 @@
 	}
 
 	.options {
-		display: flex;
+		/* display: flex; */
 		padding: 1em 0em;
+	}
+
+	.option {
+		padding: 0.7em;
 	}
 
 	.option > label {
@@ -87,14 +91,14 @@
 		appearance: none;
 		background: none;
 		font-weight: 600;
-		font-size: 0.9em;
+		font-size: 1.0em;
 		color: var(--accent-color);
 		border: 1px solid var(--accent-color);
 		border-radius: 0;
 		outline: none;
 		cursor: pointer;
 	}
-	.option + .option > label {
+	/* .option + .option > label {
 		border-left-width: 0;
 	}
 	.option:first-of-type > label {
@@ -102,7 +106,7 @@
 	}
 	.option:last-of-type > label {
 		border-radius: 0 6px 6px 0;
-	}
+	} */
 
 	input[type='radio']:checked + label {
 		background: var(--accent-color);

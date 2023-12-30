@@ -24,6 +24,7 @@
 	let current_round: object;
 	let guesses: Array<Guess> = [];
 	let my_score: number;
+	let question: string;
 
 	async function readGameState() {
 		getGame(game_name)
@@ -35,6 +36,7 @@
 				});
 				guesses.push({ player: 'lower', guess: null } as Guess);
 				guesses = guesses.sort(compare);
+				question = current_round.question.question;
 			});
 	}
 
@@ -58,6 +60,7 @@
 	<div style="padding-bottom: 1em;">
 		<InputField bind:value={wager_amount} text="enter your bet here" />
 	</div>
+	<div>{question}</div>
 	<ButtonSet options={guesses} legend={'Select a guess:'} bind:userSelected={guess} />
 	<div>
 		<Button text="Submit" onClick={() => onClickSubmit(guess)} />
