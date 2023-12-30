@@ -6,6 +6,7 @@
 	export let setGameState: (new_state: string) => void;
 	let name: string;
 	let game_name: string;
+	let get_questions_from: string = 'NumbersApi';
 
 	let error_message: string = '';
 	let no_name_error_message = 'no name';
@@ -21,7 +22,7 @@
 			error_message = no_game_room_error_message;
 			return;
 		}
-		const response: Promise<Response> = putCreateGame(game_name, name);
+		const response: Promise<Response> = putCreateGame(game_name, name, get_questions_from);
 		response.then((response) => {
 			if (response.ok) {
 				localStorage.setItem('name', name);
@@ -73,6 +74,18 @@
 	<div>
 		<Button text="Create Game" onClick={onClickCreateGame} />
 	</div>
+
+	<h3>Get Questions From</h3>
+
+	<label>
+		<input type="radio" bind:group={get_questions_from} value={'File'} />
+		ChatGPT
+	</label>
+
+	<label>
+		<input type="radio" bind:group={get_questions_from} value={'NumbersApi'} />
+		Numbers API
+	</label>
 
 	<div>
 		{error_message}

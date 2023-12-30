@@ -2,13 +2,13 @@ function getBaseServerPath(): string | null {
     return localStorage.getItem("base_server_path");
 }
 
-export async function putCreateGame(game_name: string, name: string) {
+export async function putCreateGame(game_name: string, name: string, get_questions_from: string) {
     const response: Response = await fetch(getBaseServerPath() + game_name, {
         method: "PUT",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             player: name,
-            get_questions_from: "NumbersApi"
+            get_questions_from: get_questions_from
         })
     })
     return response;
@@ -17,18 +17,18 @@ export async function putCreateGame(game_name: string, name: string) {
 export async function postJoinGame(game_name: string, name: string) {
     const request = await fetch(getBaseServerPath() + game_name, {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             player: name
         })
     })
     return request;
-  }
+}
 
 export async function getGame(game_name: string) {
     const response: Response = await fetch(getBaseServerPath() + game_name, {
         method: "GET",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
     })
     return response;
 }
@@ -37,7 +37,7 @@ export async function getGame(game_name: string) {
 export async function postWager(game_name: string, name: string, guess: number | null, wager: number) {
     const response: Response = await fetch(getBaseServerPath() + game_name + "/wager", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             player: name,
             guess: guess,
@@ -64,7 +64,7 @@ export async function postWager(game_name: string, name: string, guess: number |
 export async function postGuess(game_name: string, name: string, guess: number) {
     const response: Response = await fetch(getBaseServerPath() + game_name + "/guess", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             player: name,
             guess: guess,
@@ -76,7 +76,7 @@ export async function postGuess(game_name: string, name: string, guess: number) 
 export async function getScore(game_name: string) {
     const response: Response = await fetch(getBaseServerPath() + game_name + "/score", {
         method: "GET",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
     })
     return response;
 }
@@ -84,7 +84,7 @@ export async function getScore(game_name: string) {
 export async function getRoundScore(game_name: string) { // gets the change in score for the last round
     const response: Response = await fetch(getBaseServerPath() + game_name + "/round_score", {
         method: "GET",
-        headers: {"Content-Type": "application/json"},
+        headers: { "Content-Type": "application/json" },
     })
     return response;
 }
