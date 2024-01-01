@@ -6,6 +6,7 @@
 	let question: string;
 	let players: Array<string> = [];
 	let rounds: Array<object>;
+	let waiting_for: Array<string> = [];
 
 	async function readGameState() {
 		getGame(game_name)
@@ -16,6 +17,10 @@
 				let round = rounds.length - 1;
 				if (data.rounds[round].guesses.length == players.length) {
 					setGameState('wager');
+				} else {
+					waiting_for = players.filter(
+						(player) => !data.rounds[round].guesses.some((guess) => guess.player === player)
+					);
 				}
 				question = data.rounds[rounds.length - 1].question.question;
 			});
@@ -36,4 +41,9 @@
 
 <main>
 	<h1>Waiting for other players...</h1>
+	<ul>
+		{#each waiting_for as waiting_for_player}
+			<li>{waiting_for_player}</li>
+		{/each}
+	</ul>
 </main>
