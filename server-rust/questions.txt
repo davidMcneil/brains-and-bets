@@ -1,119 +1,126 @@
-What is the population of Beijing China? million,21
-How many countries are members of the United Nations? ,195
-In what year did the Titanic sink? ,1912
-What is the average wingspan of an adult albatross? feet,11
-How many grams are in a kilogram? ,1000
 What is the world record for the longest recorded snake? feet,32
-How many keys are on a standard piano? ,88
-What is the speed of light in kilometers per second? ,300000
 In what year was the Declaration of Independence signed? ,1776
-How many bones are in the adult human body? ,206
 What is the maximum capacity of a standard USB flash drive? gigabytes,128
 How many episodes are there in the first season of "Stranger Things"? ,8
-In what year did the first manned moon landing occur? ,1969
-What is the world record for the highest jump by a human? feet,8
-How many meters are in a kilometer? ,1000
 What is the average lifespan of a housefly? days,28
 How many planets are in our solar system? ,8
-In what year was the first iPhone released? ,2007
-What is the world record for the most push-ups in one hour? ,4567
-How many ounces are in a pound? ,16
 What is the weight of an average adult elephant? tons,5
-How many colors are there in a rainbow? ,7
-In what year did World War II end? ,1945
-How many feet are in a mile? ,5280
 What is the world record for the longest non-stop dance? hours,123
 How many teeth does an adult human typically have? ,32
 What is the speed limit on most residential streets in the United States? miles per hour,25
-In what year did the Berlin Wall fall? ,1989
-How many squares are there on a standard chessboard? ,64
-What is the average depth of the Pacific Ocean? meters,4280
-How many players are on a standard soccer team? ,11
 What is the world record for the most hot dogs eaten in 10 minutes? ,76
-In what year did the first manned spaceflight occur? ,1961
 How many inches are in a yard? ,36
-What is the average height of the Eiffel Tower? meters,324
-How many bones are in the human hand? ,27
 In what year did the Great Fire of London occur? ,1666
 What is the world record for the longest human hair? meters,5
 How many syllables are in the word "onomatopoeia"? ,6
-What is the weight of the heaviest recorded pumpkin? pounds,2624
 How many players are there in a standard volleyball team? ,6
 What is the average length of a blue whale? meters,82
 In what year did the American Civil War begin? ,1861
 How many elements are there in the periodic table? ,118
 What is the average temperature of the human body? degrees Fahrenheit,98
-How many stars are there in the Milky Way galaxy? ,100000000
-In what year did the first manned mission to the moon take place? ,1969
-How many legs does a lobster have? ,10
 What is the world record for the most books written by one author in a year? ,100
-How many cards are there in a standard deck of playing cards? ,52
 In what year was the Magna Carta signed? ,1215
 What is the average lifespan of a house cat? years,15
-How many strings are there on a standard guitar? ,6
-What is the world record for the fastest mile run by a human? minutes,3
 How many bones are in the human skull? ,22
 In what year did the Spanish Flu pandemic begin? ,1918
-How many petals does the average daisy have? ,34
 What is the weight of the largest recorded elephant? kilograms,12000
 How many continents are there on Earth? ,7
-What is the average length of the Nile River? kilometers,6650
 In what year was the first color television broadcast? ,1954
 How many dots are there on a standard six-sided die?,21
-What is the world record for the most dominoes toppled in a chain reaction? ,4491863
 How many gallons of water does the average person use per day? ,80
-What is the average lifespan of a mosquito?days,14
-In what year was the first electric light bulb invented? ,1879
-How many episodes are there in the entire "Friends" TV series? ,236
-How many players are on a standard basketball team? ,5
 What is the world record for the most consecutive days without sleep? ,11
-How many legs does a spider have? ,8
-In what year did the Industrial Revolution begin? ,1760
-How many teeth does the average adult human have? ,32
-What is the average wingspan of an albatross? meters,3
-What is the population of New Delhi India? million,31
 How many time zones are there in the world? ,24
 In what year did the Great Wall of China construction begin? ,700
-What is the average lifespan of a honeybee? days,122
-How many keys are on a standard computer keyboard? ,104
 What is the speed of sound in air at sea level? meters per second,343
 In what year was the Magna Carta signed? ,1215
 How many protons are in a carbon-12 atom? ,6
 What is the average weight of a human brain? grams,1300
 How many millimeters are in a centimeter? ,10
-What is the world record for the longest recorded hiccup? years,68
 How many sides does a dodecagon have? ,12
 In what year did the French Revolution begin? ,1789
 What is the average speed of a cheetah in kilometers per hour? ,112
 How many syllables are in the word "hippopotamus"? ,5
 What is the weight of the heaviest recorded tuna? kilograms,678
 How many valves does a trumpet typically have? ,3
-In what year was the first public railway opened? ,1804
 What is the average temperature of boiling water in degrees Celsius? ,100
 How many chambers does the human heart have? ,4
 What is the world record for the longest marathon gaming session? hours,138
-How many legs does a centipede have? ,100
 In what year did the Battle of Gettysburg take place? ,1863
 What is the average lifespan of an elephant in years? ,60
 How many vertices does a cube have? ,8
 What is the speed limit on many interstate highways in the United States? miles per hour,65
-How many carats is a standard diamond engagement ring? ,1
-In what year was the first public telephone call made? ,1876
 What is the average distance from the Earth to the Moon in kilometers? ,400
-How many petals does the average rose have? ,5
 What is the world record for the longest recorded hiccup? years,68
 How many players are on a standard baseball team? ,9
 In what year was the Eiffel Tower completed? ,1889
 How many strings are there on a standard violin? ,4
-What is the world record for the longest recorded hiccup? years,68
 How many chambers are there in the human stomach? ,4
 In what year did the Battle of Hastings take place? ,1066
-What is the average wingspan of a bald eagle in inches? ,80
 How many vertices does a tetrahedron have? ,4
-What is the world record for the longest recorded hiccup? years,68
 How many degrees are in a complete circle? ,360
 In what year did the Wright brothers make their first powered flight? ,1903
 What is the average weight of a human lung? kilograms,1
 How many eyes does a honeybee have? ,5
-What is the world record for the most push-ups in 1 minute? ,152
 How many teaspoons are in a tablespoon? ,3
+What year did World War II end,1945
+What is the value of pi rounded to the nearest whole number,3
+What is the maximum score in a game of ten-pin bowling,300
+What year was the first Internet domain name registered,1985
+How many gold medals did Michael Phelps win in his career,23
+What is the speed of light in vacuum in kilometers per second rounded to the nearest whole number,299792
+What is the perimeter of an isoceles triangle if both equal sides are 7cm and base is 5cm,19
+How many sonnets did William Shakespeare write,154
+In what year was Pluto demoted from planet to dwarf planet status,2006
+What year did The Simpsons television show first air,1989
+How many miles long is the Amazon River rounded to the nearest whole number,4345
+How long in days does Mercury take to orbit the Sun (Mercury year),88
+What year was the first email sent,1971
+In what year was Sudoku invented,1984
+In binary what is the decimal number 255,11111111
+What is the atomic number of uranium,92
+How many rooms are there in the White House,132
+How many active volcanoes are there in the world approximately,1500
+What is the population of China to the nearest billion,1
+What is the depth in meters of the Mariana Trench,11034
+What is the average lifespan in years of an elephant,68
+What is the ISBN number of the first Harry Potter book,0747532699
+What year was Google launched,1998
+How many verses are there in the Greek national anthem,158
+What is the world record for the most spoons balanced on a human body,31
+How many muscles does a human use while kissing on average,23
+How many letters are there in the German alphabet,30
+What is the world record in seconds for solving a Rubik's Cube,3
+In what year was the first satellite Sputnik launched,1957
+What is the speed of sound in air in m/s under normal atmospheric conditions,343
+What is the world record in days for standing on one foot,76
+What is the current record in km/h for men's downhill skiing,255
+What is the highest number of Michelin stars a restaurant can receive,3
+What is the highest recorded temperature in degrees Celsius in Antarctica,20
+What is the vertical drop in meters of Angel Falls,979
+What year was the Theory of Relativity first published,1905
+What is the number of laws in Isaac Newton’s theory of motion,3
+What year was Charles Darwin's book On the Origin of Species published,1859
+What year did Halley's comet last appear,1986
+What is the periodic table atomic number for Iron,26
+How many natural satellites does Jupiter have,79
+What is the estimated age of the universe in billions of years,14
+In what year did human genome sequencing project complete,2003
+What is the distance in light years to the nearest galaxy Andromeda,3
+What year was the first test tube baby born,1978
+What is the approximate age in years of oldest known fossil,3500000
+How many times does a blue whale's heart beat per minute,9
+What is the number of known species of fungi,144000
+How many neurons are there in the human brain approximated in billions,86
+What is the capacity in gigabytes of world's largest hard drive as of 2021,20000
+What year was the first photograph taken,1826
+What year was Cholera identified and named,1817
+What is the number of official World Heritage sites by UNESCO,1121
+What year was the first official football match played,1863
+What year was the first scientific calculator introduced,1972
+What is the highest number of babies born to a single woman,69
+What is the costliest painting ever sold at auction in million USD,450
+What is the height of Lhotse mountain to the nearest meter,8516
+What is the farthest known galaxy MACS1149-JD from the Earth,32000000
+What is the bestselling novel of all time in millions of copies,500
+What year was the first human heart transplant performed,1967
+What is the diameter of star Betelgeuse in times that of our sun,700

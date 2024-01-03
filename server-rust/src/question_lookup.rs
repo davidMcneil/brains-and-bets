@@ -37,7 +37,7 @@ impl QuestionLookup {
                 question: values[0].to_string(),
                 answer: values[1]
                     .parse()
-                    .expect("value after comma should be a number"),
+                    .expect(&format!("value after comma should be a number: {}", line)),
             });
             let mut rng = rand::thread_rng();
             self.questions.shuffle(&mut rng);
